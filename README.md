@@ -62,8 +62,8 @@ Add the following commands to your `package.json` file:
 ```
 {
     "scripts": {
-        "i18n": "npx -p=mmp-tool-i18n/lib/index.js --i18n_spreadsheet_id=__YOUR_I18N_SPREADSHEET_ID__",
-        "i18n:up": "npx -p=mmp-tool-i18n/lib/upsync.js --i18n_spreadsheet_id=__YOUR_I18N_SPREADSHEET_ID__"
+        "i18n": "npm explore mmp-tool-i18n -- node ./lib/index.js --i18n_spreadsheet_id=__YOUR_I18N_SPREADSHEET_ID__",
+        "i18n:up": "npm explore mmp-tool-i18n -- node ./lib/upsync.js --i18n_spreadsheet_id=__YOUR_I18N_SPREADSHEET_ID__"
     }
 }
 ```
