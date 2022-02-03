@@ -27,7 +27,7 @@ Handle localisation with a templated Google Spreadsheet
 ## Installation
 
 ```
-npm i --save-dev mmp-tool-i18n
+npm i git+ssh://git@github.com:makemepulse/makemepulse-tool-i18n.git
 ```
 
 ## Options
