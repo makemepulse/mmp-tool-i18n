@@ -2,5 +2,6 @@ node_modules
 /lib
 /src/locales
 /.tmp
+__i18n_sync.xlsx
 
 .DS_Store
