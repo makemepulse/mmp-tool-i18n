@@ -48,6 +48,7 @@ Eg: Define the `I18N_SPREADSHEET_ID` from the current spreadsheet url: https://d
 
 ```
 I18N_SPREADSHEET_ID = '1bH-aZzj38YjIZTlWhv1XKWc9NyItRAuRXnQEZoWRmzA'
+I18N_LOCALES_DIR = src/locales
 ```
 
 ## Commands

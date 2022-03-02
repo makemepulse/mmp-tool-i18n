@@ -10,7 +10,7 @@ require('dotenv').config();
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
 
 const PROJ_DIR = path.resolve('./'); // repository root folder from a classic './node_modules' folder
-const TGT_FLD = process.env.npm_config_i18n_locales_dir || 'src/locales';
+const TGT_FLD = process.env.I18N_LOCALES_DIR|| process.env.npm_config_i18n_locales_dir || 'src/locales';
 const OUT_DIR = path.resolve(PROJ_DIR, TGT_FLD);
 
 let _WORKBOOK: WorkBook;
