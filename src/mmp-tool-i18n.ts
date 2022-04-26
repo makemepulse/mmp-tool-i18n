@@ -76,7 +76,7 @@ function setDotted( key: string, val: string, obj: any ){
     o = o[ck]
   }
   const isDef = o[name] !== undefined
-  o[name] = html.unescape(val)
+  o[name] = html.unescape(val.trim());
   return isDef
 }
 
