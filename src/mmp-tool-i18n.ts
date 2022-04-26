@@ -25,7 +25,7 @@ export interface I18nFetchOptions {
 }
 
 export interface I18nData {
-  [key: string]: Record<string, string>;
+  [key: string]: Record<string, string|I18nData>;
 }
 
 export interface LocaleDef {
@@ -67,34 +67,17 @@ export function flatten(locales: any, keys: any[] = [], list: any[] = []) {
   return list;
 }
 
-/**
- * format xls data to a valid vue-i18n locale formatted data
- *
- * @param data
- * @returns flat data
- */
-export function format(data: any): I18nData {
-  const flat_data: I18nData = {};
-
-  // Iterate over locales
-  Object.keys(data).forEach((locale) => {
-    const locale_data = data[locale];
-
-    // Iterate over categories
-    Object.keys(locale_data).forEach((category) => {
-      const category_data = locale_data[category];
-
-      // Iterate over keys
-      Object.keys(category_data).forEach((key) => {
-        // unescape special chars
-        category_data[key] = html.unescape(category_data[key]);
-      });
-    });
-
-    flat_data[locale] = data[locale];
-  });
-
-  return flat_data;
+function setDotted( key: string, val: string, obj: any ){
+  const chain = key.split('.')
+  const name = chain.pop() as string;
+  let o = obj
+  for (const ck of chain) {
+    if( o[ck]=== undefined ) o[ck] = {}
+    o = o[ck]
+  }
+  const isDef = o[name] !== undefined
+  o[name] = html.unescape(val)
+  return isDef
 }
 
 /**
@@ -167,17 +150,13 @@ export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
 
         const localeObj = (data[locale] = data[locale] || {});
         const categoryObj = (localeObj[category] = localeObj[category] || {});
-
-        categoryObj[key] = record[locale] || `${locale}.${category}.${key}`;
-        categoryObj[key] = categoryObj[key].toString().trim();
+        setDotted(key, record[locale] || `${locale}.${category}.${key}`, categoryObj);
       }
     });
   });
 
-  const flat_data: I18nData = format(data);
-
   console.log('[i18n] Locales loaded');
-  return flat_data;
+  return data;
 }
 
 /**
