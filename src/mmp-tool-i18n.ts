@@ -5,17 +5,31 @@ import * as path from 'path';
 import * as XLSX from 'xlsx';
 import { WorkBook } from 'xlsx';
 import * as mkdirp from 'mkdirp';
+import * as parseArgs from 'minimist';
 
 require('dotenv').config();
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
 
+const argv = parseArgs(process.argv.slice(2), {
+  string: ['ignore-fields', 'spreadsheet-id', 'spreadsheet-tab', 'locales-dir'],
+  boolean: ['prettify']
+}) as ArgumentValues;
+
 const PROJ_DIR = path.resolve('./'); // repository root folder from a classic './node_modules' folder
-const TGT_FLD = process.env.I18N_LOCALES_DIR|| process.env.npm_config_i18n_locales_dir || 'src/locales';
+const TGT_FLD = process.env.I18N_LOCALES_DIR|| argv['locales-dir'] || 'src/locales';
 const OUT_DIR = path.resolve(PROJ_DIR, TGT_FLD);
 
 let _WORKBOOK: WorkBook;
 let _LOCALES: string[];
 let _OPTIONS: I18nFetchOptions;
+
+export interface ArgumentValues {
+  'ignore-fields'?: string;
+  'spreadsheet-id'?: string;
+  'spreadsheet-tab'?: string;
+  'locales-dir'?: string;
+  prettify?: boolean;
+}
 
 export interface I18nFetchOptions {
   apiKey?: string;
@@ -162,12 +176,13 @@ export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
 /**
  *
  * @param locales
+ * @param prettify Prettify output. Optionnal. Default to false
  */
-export async function exportFiles(locales: I18nData) {
+export async function exportFiles(locales: I18nData, prettify = argv.prettify) {
   mkdirp.sync(OUT_DIR);
   for (const locale of Object.keys(locales)) {
     console.log(`[i18n] Writing ${TGT_FLD}/${locale}.json`);
-    fs.writeFile(OUT_DIR + `/${locale}.json`, JSON.stringify(locales[locale]), () => {});
+    fs.writeFile(OUT_DIR + `/${locale}.json`, JSON.stringify(locales[locale], undefined, prettify ? 2 : undefined), () => {});
   }
 }
 

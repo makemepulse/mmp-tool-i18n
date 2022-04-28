@@ -19,7 +19,9 @@
     "type": "git",
     "url": "git+https://"
   },
-  "keywords": ["vue-i18n"],
+  "keywords": [
+    "vue-i18n"
+  ],
   "author": "makemepulse",
   "license": "ISC",
   "bugs": {
@@ -30,6 +32,7 @@
     "@babel/preset-env": "^7.16.7",
     "@babel/preset-typescript": "^7.16.7",
     "@types/jest": "^27.4.0",
+    "@types/minimist": "^1.2.2",
     "@types/node": "^17.0.8",
     "jest": "^27.4.7",
     "prettier": "^2.5.1",
@@ -46,6 +49,7 @@
     "axios": "^0.24.0",
     "dotenv": "^10.0.0",
     "fs": "^0.0.1-security",
+    "minimist": "^1.2.6",
     "mkdirp": "^1.0.4",
     "path": "^0.12.7",
     "xlsx": "^0.17.4"
