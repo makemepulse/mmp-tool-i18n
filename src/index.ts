@@ -1,16 +1,9 @@
-import { fetch, exportFiles, I18nFetchOptions } from './mmp-tool-i18n';
+import { fetch, exportFiles, I18nFetchOptions, ArgumentValues } from './mmp-tool-i18n';
 import * as path from 'path';
 import * as parseArgs from 'minimist';
 
 require('dotenv').config();
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
-
-interface ArgumentValues {
-  'ignore-fields'?: string;
-  'spreadsheet-id'?: string;
-  'spreadsheet-tab'?: string;
-  prettify?: boolean;
-}
 
 const DEFAULT_IGNORE_FIELDS = ['ID', 'category', 'key', 'description', 'status'];
 
