@@ -16,7 +16,7 @@ const argv = parseArgs(process.argv.slice(2), {
 }) as ArgumentValues;
 
 const PROJ_DIR = path.resolve('./'); // repository root folder from a classic './node_modules' folder
-const TGT_FLD = process.env.I18N_LOCALES_DIR|| argv['locales-dir'] || 'src/locales';
+const TGT_FLD = process.env.I18N_LOCALES_DIR || argv['locales-dir'] || 'src/locales';
 const OUT_DIR = path.resolve(PROJ_DIR, TGT_FLD);
 
 let _WORKBOOK: WorkBook;
@@ -39,7 +39,7 @@ export interface I18nFetchOptions {
 }
 
 export interface I18nData {
-  [key: string]: Record<string, string|I18nData>;
+  [key: string]: Record<string, string | I18nData>;
 }
 
 export interface LocaleDef {
@@ -81,12 +81,12 @@ export function flatten(locales: any, keys: any[] = [], list: any[] = []) {
   return list;
 }
 
-function setDotted( key: string, val: string, obj: any ){
+function setDotted(key: string, val: string, obj: any) {
   const chain = key.split('.')
   const name = chain.pop() as string;
   let o = obj
   for (const ck of chain) {
-    if( o[ck]=== undefined ) o[ck] = {}
+    if (o[ck] === undefined) o[ck] = {}
     o = o[ck]
   }
   const isDef = o[name] !== undefined
@@ -148,10 +148,21 @@ export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
   const workbookURL = `https://docs.google.com/spreadsheets/d/${_OPTIONS.appId}/pub?output=xlsx`;
   await getWorkBook(workbookURL);
 
-  var records: I18nData[] = XLSX.utils.sheet_to_json(_WORKBOOK.Sheets[_OPTIONS.tab]);
-  if (!records[0]) {
-    console.error(`[i18n] Tab "${_OPTIONS.tab}" do not exist`);
+  let tabs = _OPTIONS.tab.split(",");
+  var records: I18nData[] = [];
+  for (let i = 0; i < tabs.length; i++) {
+    const data: I18nData[] = XLSX.utils.sheet_to_json(_WORKBOOK.Sheets[tabs[i]]);
+    if (!data[0]) {
+      console.warn(`[i18n] Tab "${tabs[i]}" do not exist`);
+      continue;
+    }
+    records.push(...data);
   }
+
+  // var records: I18nData[] = XLSX.utils.sheet_to_json(_WORKBOOK.Sheets[_OPTIONS.tab]);
+  // if (!records[0]) {
+  //   console.error(`[i18n] Tab "${_OPTIONS.tab}" do not exist`);
+  // }
 
   const locales = getWorkbookLanguages(records);
   const data: any = {};
@@ -182,7 +193,7 @@ export async function exportFiles(locales: I18nData, prettify = argv.prettify) {
   mkdirp.sync(OUT_DIR);
   for (const locale of Object.keys(locales)) {
     console.log(`[i18n] Writing ${TGT_FLD}/${locale}.json`);
-    fs.writeFile(OUT_DIR + `/${locale}.json`, JSON.stringify(locales[locale], undefined, prettify ? 2 : undefined), () => {});
+    fs.writeFile(OUT_DIR + `/${locale}.json`, JSON.stringify(locales[locale], undefined, prettify ? 2 : undefined), () => { });
   }
 }
 
@@ -192,7 +203,7 @@ export async function exportFiles(locales: I18nData, prettify = argv.prettify) {
  * @returns
  */
 export async function upsync(options: I18nFetchOptions): Promise<Boolean> {
-  
+
   _OPTIONS = options;
 
   console.warn('[i18n] upsync', _OPTIONS);
