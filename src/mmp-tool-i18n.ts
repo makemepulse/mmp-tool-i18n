@@ -173,6 +173,10 @@ export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
         const key = record.key;
         const category = record.category;
 
+        if (!key) {
+          return;
+        }
+
         const localeObj = (data[locale] = data[locale] || {});
         const categoryObj = (localeObj[category] = localeObj[category] || {});
         setDotted(key, record[locale] || `${locale}.${category}.${key}`, categoryObj);
