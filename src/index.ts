@@ -12,8 +12,9 @@ const argv = parseArgs(process.argv.slice(2), {
   boolean: ['prettify']
 }) as ArgumentValues;
 
-const ignoreFields = argv['ignore-fields']
-  ? argv['ignore-fields'].split(',').map(field => field.trim())
+const customIgnoreFields = process.env.I18N_IGNORE_FIELDS || argv['ignore-fields']
+const ignoreFields = customIgnoreFields
+  ? customIgnoreFields.split(',').map(field => field.trim())
   : DEFAULT_IGNORE_FIELDS;
 const options:I18nFetchOptions = {
   appId: (process.env.I18N_SPREADSHEET_ID || argv['spreadsheet-id'])!,
