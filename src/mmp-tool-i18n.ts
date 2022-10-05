@@ -148,7 +148,7 @@ export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
   const workbookURL = `https://docs.google.com/spreadsheets/d/${_OPTIONS.appId}/pub?output=xlsx`;
   await getWorkBook(workbookURL);
 
-  let tabs = _OPTIONS.tab.split(",");
+  let tabs = _OPTIONS.tab.split(",").map(tab => tab.trim());
   var records: I18nData[] = [];
   for (let i = 0; i < tabs.length; i++) {
     const data: I18nData[] = XLSX.utils.sheet_to_json(_WORKBOOK.Sheets[tabs[i]], { raw: false });
