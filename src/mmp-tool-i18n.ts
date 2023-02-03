@@ -10,9 +10,10 @@ import * as parseArgs from 'minimist';
 require('dotenv').config();
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
 
-const argv = parseArgs(process.argv.slice(2), {
-  string: ['ignore-fields', 'spreadsheet-id', 'spreadsheet-tab', 'locales-dir'],
-  boolean: ['prettify']
+// @ts-ignore
+const argv = (parseArgs?.default || parseArgs)(process.argv.slice(2), {
+  string: ['spreadsheet-id', 'spreadsheet-tab', 'ignore-fields', 'only-fields', 'locales-dir'],
+  boolean: ['prettify'],
 }) as ArgumentValues;
 
 const PROJ_DIR = path.resolve('./'); // repository root folder from a classic './node_modules' folder
@@ -24,9 +25,10 @@ let _LOCALES: string[];
 let _OPTIONS: I18nFetchOptions;
 
 export interface ArgumentValues {
-  'ignore-fields'?: string;
   'spreadsheet-id'?: string;
   'spreadsheet-tab'?: string;
+  'ignore-fields'?: string;
+  'only-fields'?: string;
   'locales-dir'?: string;
   prettify?: boolean;
 }
@@ -36,6 +38,7 @@ export interface I18nFetchOptions {
   appId: string;
   tab: string;
   ignoreFields?: string[];
+  onlyFields?: string[];
 }
 
 export interface I18nData {
@@ -82,16 +85,16 @@ export function flatten(locales: any, keys: any[] = [], list: any[] = []) {
 }
 
 function setDotted(key: string, val: string, obj: any) {
-  const chain = key.split('.')
+  const chain = key.split('.');
   const name = chain.pop() as string;
-  let o = obj
+  let o = obj;
   for (const ck of chain) {
-    if (o[ck] === undefined) o[ck] = {}
-    o = o[ck]
+    if (o[ck] === undefined) o[ck] = {};
+    o = o[ck];
   }
-  const isDef = o[name] !== undefined
+  const isDef = o[name] !== undefined;
   o[name] = html.unescape(val.trim());
-  return isDef
+  return isDef;
 }
 
 /**
@@ -132,7 +135,17 @@ export function getWorkbookLanguages(records: I18nData[]): string[] {
   if (_LOCALES) return _LOCALES;
 
   _LOCALES = (records[0] && Object.keys(records[0])) || [];
-  _LOCALES = _LOCALES.filter((value) => _OPTIONS.ignoreFields && _OPTIONS.ignoreFields.indexOf(value) == -1);
+  _LOCALES = _LOCALES.filter((locale) => {
+    let include = true;
+    if (_OPTIONS.ignoreFields?.length) {
+      include = _OPTIONS.ignoreFields.every((field) => field.toLowerCase() !== locale.toLowerCase());
+    }
+    if (include && _OPTIONS.onlyFields?.length) {
+      include = _OPTIONS.onlyFields.some((field) => field.toLowerCase() === locale.toLowerCase());
+    }
+
+    return include;
+  });
 
   return _LOCALES;
 }
@@ -148,7 +161,7 @@ export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
   const workbookURL = `https://docs.google.com/spreadsheets/d/${_OPTIONS.appId}/pub?output=xlsx`;
   await getWorkBook(workbookURL);
 
-  let tabs = _OPTIONS.tab.split(",").map(tab => tab.trim());
+  let tabs = _OPTIONS.tab.split(',').map((tab) => tab.trim());
   var records: I18nData[] = [];
   for (let i = 0; i < tabs.length; i++) {
     const data: I18nData[] = XLSX.utils.sheet_to_json(_WORKBOOK.Sheets[tabs[i]], { raw: false });
@@ -197,7 +210,11 @@ export async function exportFiles(locales: I18nData, prettify = argv.prettify) {
   mkdirp.sync(OUT_DIR);
   for (const locale of Object.keys(locales)) {
     console.log(`[i18n] Writing ${TGT_FLD}/${locale}.json`);
-    fs.writeFile(OUT_DIR + `/${locale}.json`, JSON.stringify(locales[locale], undefined, prettify ? 2 : undefined), () => { });
+    fs.writeFile(
+      OUT_DIR + `/${locale}.json`,
+      JSON.stringify(locales[locale], undefined, prettify ? 2 : undefined),
+      () => {},
+    );
   }
 }
 
@@ -207,7 +224,6 @@ export async function exportFiles(locales: I18nData, prettify = argv.prettify) {
  * @returns
  */
 export async function upsync(options: I18nFetchOptions): Promise<Boolean> {
-
   _OPTIONS = options;
 
   console.warn('[i18n] upsync', _OPTIONS);
