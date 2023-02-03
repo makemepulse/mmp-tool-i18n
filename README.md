@@ -21,8 +21,8 @@ Handle localisation with a templated Google Spreadsheet
     1. [New Google Sheets from a template](https://docs.google.com/spreadsheets/u/0/?ftv=1&folder=0ABUmECcOxpcZUk9PVA&tgif=d)
     2. Choose `Template_tool_i18n` tempate
     3. Add/Remove/Update languages the project need to support
-    5. **The spreadsheet must be public !** Go to _File > Share > Publish to the web_ to make it public.
-    4. That'it !
+    5. **The spreadsheet must be public!** Go to _File > Share > Publish to the web_ to make it public.
+    4. That'it!
 
 ## Installation
 
@@ -32,13 +32,14 @@ npm i git+ssh://git@github.com:makemepulse/makemepulse-tool-i18n.git
 
 ## Options
 
-| Argument             | Type    | Description                                                 | Default                                    |
-| -------------------- | ------- | ----------------------------------------------------------- | ------------------------------------------ |
-| `--spreadsheet-id`   | string  | The id of the spreadsheet                                   | `process.env.I18N_SPREADSHEET_ID`    |
-| `--spreadsheet-tab`  | string  | The tab of the spreadsheet                                  | `"locales"`    |
-| `--ignore-fields`    | string  | Comma-separated list of fields whiches **are not** locales  | `ID,category,key,description,status`
-| `--locales-dir`      | string  | The path of the locales folder                              | `src/locales`
-| `--prettify`         | boolean | Format the JSON output                                      | `false`
+| CLI argument         | Env variable           | Type    | Description                                                     | Default                                    |
+| -------------------- | ---------------------- | ------- | --------------------------------------------------------------- | ------------------------------------------ |
+| `--spreadsheet-id`   | `I18N_SPREADSHEET_ID`  | string  | The id of the spreadsheet                                       | `""`                                       |
+| `--spreadsheet-tab`  | `I18N_SPREADSHEET_TAB` | string  | The tab of the spreadsheet                                      | `"locales"`                                |
+| `--ignore-fields`    | `I18N_IGNORE_FIELDS`   | string  | Comma-separated list of fields that **are not** locales         | `"ID,category,key,description,status"`     |
+| `--only-fields`      | `I18N_ONLY_FIELDS`     | string  | Comma-separated list of fields to target **only** these locales | `""`                                       |
+| `--locales-dir`      | `I18N_LOCALES_DIR`     | string  | The path of the locales folder                                  | `"src/locales"`                            |
+| `--prettify`         | -                      | boolean | Format the JSON output                                          | `false`                                    |
 
 
 ## Settings
@@ -74,7 +75,7 @@ Add the following commands to your `package.json` file:
 
 ### Arabic language
 
-*Please note that if your project needs arabic locales and if there is Latin character in your arabic locales, you must the  `v-html` directive to display the locales*
+*Please note that if your project needs arabic locales and if there is Latin character in your arabic locales, you must the `v-html` directive to display the locales*
 
 ## Test
 
