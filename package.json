@@ -1,6 +1,6 @@
 {
   "name": "mmp-tool-i18n",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "handle locales with Google Spreadsheet and vue-i18n plugin",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
