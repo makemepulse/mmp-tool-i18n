@@ -109,13 +109,16 @@ export async function getWorkBook(url: string): Promise<WorkBook> {
     mkdirp.sync('.tmp');
   }
 
+  const { appId: filename = 'locale' } = _OPTIONS;
+  const tmpFile = `./.tmp/${filename}.xlsx`;
+
   try {
-    await downloadFile(url, './.tmp/locale.xlsx');
+    await downloadFile(url, tmpFile);
   } catch (e) {
     console.warn('[i18n] No locale fetched, try to get tmp file');
   }
 
-  _WORKBOOK = XLSX.readFile('./.tmp/locale.xlsx');
+  _WORKBOOK = XLSX.readFile(tmpFile);
   return _WORKBOOK;
 }
 
