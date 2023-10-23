@@ -12,7 +12,7 @@ require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
 
 // @ts-ignore
 const argv = (parseArgs?.default || parseArgs)(process.argv.slice(2), {
-  string: ['spreadsheet-id', 'spreadsheet-tab', 'ignore-fields', 'only-fields', 'locales-dir'],
+  string: ['spreadsheet-id', 'spreadsheet-tab', 'ignore-fields', 'only-fields', 'locales-dir', 'filename'],
   boolean: ['prettify'],
 }) as ArgumentValues;
 
@@ -30,6 +30,7 @@ export interface ArgumentValues {
   'ignore-fields'?: string;
   'only-fields'?: string;
   'locales-dir'?: string;
+  filename?: string;
   prettify?: boolean;
 }
 
@@ -39,6 +40,7 @@ export interface I18nFetchOptions {
   tab: string;
   ignoreFields?: string[];
   onlyFields?: string[];
+  filename?: string;
 }
 
 export interface I18nData {
@@ -54,6 +56,10 @@ export interface CountryDef {
   locale: string;
   label: string;
   languages: Array<LocaleDef>;
+}
+
+export interface FilenamePlaceholders {
+  locale: string;
 }
 
 export function isString(v: any) {
@@ -95,6 +101,13 @@ function setDotted(key: string, val: string, obj: any) {
   const isDef = o[name] !== undefined;
   o[name] = html.unescape(val.trim());
   return isDef;
+}
+
+function formatFilename(filename: string, placeholders: FilenamePlaceholders) {
+  return Object.entries(placeholders).reduce(
+    (filename, [placeholder, value]) => filename.replace(`[${placeholder}]`, value),
+    filename,
+  );
 }
 
 /**
@@ -210,11 +223,18 @@ export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
  * @param prettify Prettify output. Optionnal. Default to false
  */
 export async function exportFiles(locales: I18nData, prettify = argv.prettify) {
-  mkdirp.sync(OUT_DIR);
+  const _filename = _OPTIONS.filename || '[locale]';
+
   for (const locale of Object.keys(locales)) {
-    console.log(`[i18n] Writing ${TGT_FLD}/${locale}.json`);
+    const [filename, ...dirs] = formatFilename(_filename, { locale }).split('/').reverse();
+
+    const target = dirs.reverse().join('/');
+    const outDir = `${OUT_DIR}${target ? '/' + target : ''}`;
+    mkdirp.sync(outDir);
+
+    console.log(`[i18n] Writing ${TGT_FLD}${target ? '/' + target : ''}/${filename}.json`);
     fs.writeFile(
-      OUT_DIR + `/${locale}.json`,
+      `${outDir}/${filename}.json`,
       JSON.stringify(locales[locale], undefined, prettify ? 2 : undefined),
       () => {},
     );
@@ -228,6 +248,7 @@ export async function exportFiles(locales: I18nData, prettify = argv.prettify) {
  */
 export async function upsync(options: I18nFetchOptions): Promise<Boolean> {
   _OPTIONS = options;
+  const _filename = _OPTIONS.filename || '[locale]';
 
   console.warn('[i18n] upsync', _OPTIONS);
 
@@ -243,7 +264,12 @@ export async function upsync(options: I18nFetchOptions): Promise<Boolean> {
   let data: any[] = [];
 
   for (const locale of locales) {
-    const localesPath = path.resolve(OUT_DIR, `${locale}.json`);
+    const [filename, ...dirs] = formatFilename(_filename, { locale }).split('/').reverse();
+
+    const target = dirs.reverse().join('/');
+    const outDir = `${OUT_DIR}${target ? '/' + target : ''}`;
+
+    const localesPath = path.resolve(`${outDir}/${filename}.json`);
     const localesStr = await fs.promises.readFile(localesPath, { encoding: 'utf-8' });
     const localesData = JSON.parse(localesStr);
 

@@ -8,7 +8,7 @@ require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
 const DEFAULT_IGNORE_FIELDS = ['ID', 'category', 'key', 'description', 'status'];
 
 const argv = parseArgs(process.argv.slice(2), {
-  string: ['spreadsheet-id', 'spreadsheet-tab', 'ignore-fields', 'only-fields', 'locales-dir'],
+  string: ['spreadsheet-id', 'spreadsheet-tab', 'ignore-fields', 'only-fields', 'locales-dir', 'filename'],
   boolean: ['prettify'],
 }) as ArgumentValues;
 
@@ -23,6 +23,7 @@ const options: I18nFetchOptions = {
   tab: process.env.I18N_SPREADSHEET_TAB || argv['spreadsheet-tab'] || 'locales',
   ignoreFields,
   onlyFields,
+  filename: process.env.I18N_FILENAME || argv['filename'] || '[locale]',
 };
 
 test(`Fetch Google Spreadsheet ${options.appId}`, async () => {
