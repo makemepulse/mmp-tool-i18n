@@ -172,7 +172,7 @@ export function getWorkbookLanguages(records: I18nData[]): string[] {
 export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
   _OPTIONS = options;
 
-  console.warn('[i18n] fetch', _OPTIONS);
+  console.log('[i18n] fetch', _OPTIONS);
 
   const workbookURL = `https://docs.google.com/spreadsheets/d/${_OPTIONS.appId}/pub?output=xlsx`;
   await getWorkBook(workbookURL);
@@ -250,7 +250,7 @@ export async function upsync(options: I18nFetchOptions): Promise<Boolean> {
   _OPTIONS = options;
   const _filename = _OPTIONS.filename || '[locale]';
 
-  console.warn('[i18n] upsync', _OPTIONS);
+  console.log('[i18n] upsync', _OPTIONS);
 
   await getWorkBook(`https://docs.google.com/spreadsheets/d/${_OPTIONS.appId}/pub?output=xlsx`);
 
