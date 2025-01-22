@@ -9,7 +9,7 @@ const DEFAULT_IGNORE_FIELDS = ['ID', 'category', 'key', 'description', 'status']
 
 const argv = parseArgs(process.argv.slice(2), {
   string: ['spreadsheet-id', 'spreadsheet-tab', 'ignore-fields', 'only-fields', 'locales-dir', 'filename'],
-  boolean: ['prettify'],
+  boolean: ['prettify', 'flatten'],
 }) as ArgumentValues;
 
 const customIgnoreFields = process.env.I18N_IGNORE_FIELDS || argv['ignore-fields'];

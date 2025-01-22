@@ -13,7 +13,7 @@ require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
 // @ts-ignore
 const argv = (parseArgs?.default || parseArgs)(process.argv.slice(2), {
   string: ['spreadsheet-id', 'spreadsheet-tab', 'ignore-fields', 'only-fields', 'locales-dir', 'filename'],
-  boolean: ['prettify'],
+  boolean: ['prettify', 'flatten'],
 }) as ArgumentValues;
 
 const PROJ_DIR = path.resolve('./'); // repository root folder from a classic './node_modules' folder
@@ -32,6 +32,7 @@ export interface ArgumentValues {
   'locales-dir'?: string;
   filename?: string;
   prettify?: boolean;
+  flatten?: boolean;
 }
 
 export interface I18nFetchOptions {
