@@ -1,12 +1,12 @@
 import { html } from './utils/unescape';
 import { downloadFile } from './utils/download-file';
+import { flatten as flattenKeys } from './utils/flatten';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as XLSX from 'xlsx';
 import type { WorkBook } from 'xlsx';
 import * as mkdirp from 'mkdirp';
 import * as parseArgs from 'minimist';
-import { flatten as flattenKeys } from 'flat';
 
 require('dotenv').config();
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
