@@ -209,8 +209,9 @@ export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
         }
 
         const localeObj = (data[locale] = data[locale] || {});
-        const categoryObj = (localeObj[category] = localeObj[category] || {});
-        setDotted(key, record[locale] || `${locale}.${category}.${key}`, categoryObj);
+        const categoryObj = category ? (localeObj[category] = localeObj[category] || {}) : localeObj;
+        const defaultVal = [locale, category, key].filter(Boolean).join('.');
+        setDotted(key, record[locale] || defaultVal, categoryObj);
       }
     });
   });
