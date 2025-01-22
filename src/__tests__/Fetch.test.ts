@@ -1,6 +1,6 @@
 import { fetch, exportFiles, I18nFetchOptions, ArgumentValues } from '../mmp-tool-i18n';
 import * as path from 'path';
-import parseArgs from 'minimist';
+import * as parseArgs from 'minimist';
 
 require('dotenv').config();
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });

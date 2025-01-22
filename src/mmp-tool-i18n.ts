@@ -3,7 +3,7 @@ import { downloadFile } from './utils/download-file';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as XLSX from 'xlsx';
-import { WorkBook } from 'xlsx';
+import type { WorkBook } from 'xlsx';
 import * as mkdirp from 'mkdirp';
 import * as parseArgs from 'minimist';
 
