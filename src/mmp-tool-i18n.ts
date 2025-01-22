@@ -3,9 +3,10 @@ import { downloadFile } from './utils/download-file';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as XLSX from 'xlsx';
-import { WorkBook } from 'xlsx';
+import type { WorkBook } from 'xlsx';
 import * as mkdirp from 'mkdirp';
 import * as parseArgs from 'minimist';
+import { flatten as flattenKeys } from 'flat';
 
 require('dotenv').config();
 require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
@@ -13,7 +14,7 @@ require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
 // @ts-ignore
 const argv = (parseArgs?.default || parseArgs)(process.argv.slice(2), {
   string: ['spreadsheet-id', 'spreadsheet-tab', 'ignore-fields', 'only-fields', 'locales-dir', 'filename'],
-  boolean: ['prettify'],
+  boolean: ['prettify', 'flatten'],
 }) as ArgumentValues;
 
 const PROJ_DIR = path.resolve('./'); // repository root folder from a classic './node_modules' folder
@@ -32,6 +33,7 @@ export interface ArgumentValues {
   'locales-dir'?: string;
   filename?: string;
   prettify?: boolean;
+  flatten?: boolean;
 }
 
 export interface I18nFetchOptions {
@@ -70,7 +72,7 @@ export function csvEscape(s: string) {
   return s.replace('"', '""');
 }
 
-export function flatten(locales: any, keys: any[] = [], list: any[] = []) {
+export function setFlatten(locales: any, keys: any[] = [], list: any[] = []) {
   for (const key in locales) {
     keys.push(key);
     const val = locales[key];
@@ -81,7 +83,7 @@ export function flatten(locales: any, keys: any[] = [], list: any[] = []) {
         val,
       });
     } else {
-      flatten(val, keys, list);
+      setFlatten(val, keys, list);
     }
 
     keys.pop();
@@ -172,7 +174,7 @@ export function getWorkbookLanguages(records: I18nData[]): string[] {
 export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
   _OPTIONS = options;
 
-  console.warn('[i18n] fetch', _OPTIONS);
+  console.log('[i18n] fetch', _OPTIONS);
 
   const workbookURL = `https://docs.google.com/spreadsheets/d/${_OPTIONS.appId}/pub?output=xlsx`;
   await getWorkBook(workbookURL);
@@ -207,8 +209,9 @@ export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
         }
 
         const localeObj = (data[locale] = data[locale] || {});
-        const categoryObj = (localeObj[category] = localeObj[category] || {});
-        setDotted(key, record[locale] || `${locale}.${category}.${key}`, categoryObj);
+        const categoryObj = category ? (localeObj[category] = localeObj[category] || {}) : localeObj;
+        const defaultVal = [locale, category, key].filter(Boolean).join('.');
+        setDotted(key, record[locale] || defaultVal, categoryObj);
       }
     });
   });
@@ -222,8 +225,9 @@ export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
  * @param locales
  * @param prettify Prettify output. Optionnal. Default to false
  */
-export async function exportFiles(locales: I18nData, prettify = argv.prettify) {
+export async function exportFiles(locales: I18nData, options: Pick<ArgumentValues, "prettify" | "flatten"> = {}) {
   const _filename = _OPTIONS.filename || '[locale]';
+  const { prettify = argv.prettify, flatten = argv.flatten } = options;
 
   for (const locale of Object.keys(locales)) {
     const [filename, ...dirs] = formatFilename(_filename, { locale }).split('/').reverse();
@@ -235,7 +239,7 @@ export async function exportFiles(locales: I18nData, prettify = argv.prettify) {
     console.log(`[i18n] Writing ${TGT_FLD}${target ? '/' + target : ''}/${filename}.json`);
     fs.writeFile(
       `${outDir}/${filename}.json`,
-      JSON.stringify(locales[locale], undefined, prettify ? 2 : undefined),
+      JSON.stringify(flatten ? flattenKeys(locales[locale]) : locales[locale], undefined, prettify ? 2 : undefined),
       () => {},
     );
   }
@@ -250,7 +254,7 @@ export async function upsync(options: I18nFetchOptions): Promise<Boolean> {
   _OPTIONS = options;
   const _filename = _OPTIONS.filename || '[locale]';
 
-  console.warn('[i18n] upsync', _OPTIONS);
+  console.log('[i18n] upsync', _OPTIONS);
 
   await getWorkBook(`https://docs.google.com/spreadsheets/d/${_OPTIONS.appId}/pub?output=xlsx`);
 
@@ -273,7 +277,7 @@ export async function upsync(options: I18nFetchOptions): Promise<Boolean> {
     const localesStr = await fs.promises.readFile(localesPath, { encoding: 'utf-8' });
     const localesData = JSON.parse(localesStr);
 
-    const flats = flatten(localesData);
+    const flats = setFlatten(localesData);
 
     flats.forEach(({ key, val }: { key: string; val: string }) => {
       const category = key.split('.', 1)[0];

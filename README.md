@@ -41,6 +41,7 @@ npm i git+ssh://git@github.com:makemepulse/makemepulse-tool-i18n.git
 | `--locales-dir`      | `I18N_LOCALES_DIR`     | string  | The path of the locales folder                                  | `"src/locales"`                            |
 | `--filename`         | `I18N_FILENAME`        | string  | The pattern to use for naming exported JSON for each locale.<br>Forward slashes `/` can be used to place files in sub-directories.<br>Available placeholders:<br>- `[locale]`: The locale name                            | `"[locale]"`                            |
 | `--prettify`         | -                      | boolean | Format the JSON output                                          | `false`                                    |
+| `--flatten`          | -                      | boolean | Flatten nested keys into one in the JSON output                 | `false`                                    |
 
 
 ## Settings
