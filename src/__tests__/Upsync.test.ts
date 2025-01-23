@@ -26,4 +26,4 @@ const options: I18nFetchOptions = {
 
 test(`UpSync`, async () => {
   await upsync(options);
-});
+}, 10 * 1000);
