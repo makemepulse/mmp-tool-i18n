@@ -152,10 +152,8 @@ export function getWorkbookLanguages(records: I18nData[]): string[] {
   if (!_WORKBOOK) return [];
   if (_LOCALES) return _LOCALES;
 
-  _LOCALES = records.flatMap((record) => record ? Object.keys(record) : []);
-  _LOCALES = _LOCALES.filter((locale, i, locales) => {
-    if (locales.indexOf(locale) !== i) return false;
-
+  _LOCALES = (records[0] && Object.keys(records[0])) || [];
+  _LOCALES = _LOCALES.filter((locale) => {
     let include = true;
     if (_OPTIONS.ignoreFields?.length) {
       include = _OPTIONS.ignoreFields.every((field) => field.toLowerCase() !== locale.toLowerCase());
