@@ -182,7 +182,7 @@ export async function fetch(options: I18nFetchOptions): Promise<I18nData> {
   let tabs = _OPTIONS.tab.split(',').map((tab) => tab.trim());
   var records: I18nData[] = [];
   for (let i = 0; i < tabs.length; i++) {
-    const data: I18nData[] = XLSX.utils.sheet_to_json(_WORKBOOK.Sheets[tabs[i]], { raw: false });
+    const data: I18nData[] = XLSX.utils.sheet_to_json(_WORKBOOK.Sheets[tabs[i]], { raw: false, defval: '' });
     if (!data[0]) {
       console.warn(`[i18n] Tab "${tabs[i]}" do not exist`);
       continue;
@@ -258,7 +258,7 @@ export async function upsync(options: I18nFetchOptions): Promise<Boolean> {
 
   await getWorkBook(`https://docs.google.com/spreadsheets/d/${_OPTIONS.appId}/pub?output=xlsx`);
 
-  var records: I18nData[] = XLSX.utils.sheet_to_json(_WORKBOOK.Sheets[_OPTIONS.tab], { raw: false });
+  var records: I18nData[] = XLSX.utils.sheet_to_json(_WORKBOOK.Sheets[_OPTIONS.tab], { raw: false, defval: '' });
   if (!records[0]) {
     console.error(`[i18n] Tab "${options.tab}" do not exist`);
   }
